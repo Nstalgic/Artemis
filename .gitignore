@@ -1,0 +1,9 @@
+__pycache__/
+.git/
+.pyc
+.test_csv/
+.qt_for_python/
+saved_data
+.vscode/settings.json
+.qt_for_python/uic/main.py
+setup.py
