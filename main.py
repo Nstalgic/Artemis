@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
         self.main_ui.setupUi(self)
         global WIDGETS
         WIDGETS = self.main_ui
-        self.version = "v1.0"
+        self.version = "v1.0.1"
         Settings.ENABLE_CUSTOM_TITLE_BAR = True
 
         title = "Artemis"
@@ -228,9 +228,12 @@ class MainWindow(QMainWindow):
             threadSignals.update_progressbar_value.emit(WIDGETS.progressBar.value() + 1)
 
             if file not in self.saved_files:
-                to_append = self._parse_files(file)
-                self.table_entries.append(to_append)
-                print(f"New File Saved: {file}")
+                try:
+                    to_append = self._parse_files(file)
+                    self.table_entries.append(to_append)
+                    print(f"New File Saved: {file}")
+                except AttributeError:
+                    continue
 
         util.Save(
             self.all_maps,
