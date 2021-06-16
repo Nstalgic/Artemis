@@ -536,11 +536,31 @@ class Voltaic:
                 "B180T Voltaic Easy",
                 "Smoothbot TS Voltaic Easy",
             ],
-            "Silver": [
-                57,
-                56,
-                150,
+            "Bronze": [
+                40,
+                52,
+                100,
+                83,
+                70,
                 95,
+                1700,
+                1800,
+                700,
+                7500,
+                835,
+                775,
+                65,
+                50,
+                74,
+                45,
+                40,
+                35,
+            ],
+            "Silver": [
+                50,
+                61,
+                150,
+                93,
                 82,
                 108,
                 2100,
@@ -549,18 +569,18 @@ class Voltaic:
                 8500,
                 845,
                 800,
-                69,
+                80,
                 58,
-                78,
+                82,
                 54,
-                46,
+                51,
                 42,
             ],
             "Gold": [
-                64,
-                65,
+                56,
+                70,
                 200,
-                105,
+                103,
                 91,
                 120,
                 2400,
@@ -569,18 +589,18 @@ class Voltaic:
                 10000,
                 855,
                 825,
-                75,
+                85,
                 67,
-                86,
+                90,
                 60,
-                55,
+                60,
                 46,
             ],
             "Platinum": [
-                75,
-                72,
+                66,
+                77,
                 250,
-                115,
+                113,
                 100,
                 132,
                 2800,
@@ -588,19 +608,19 @@ class Voltaic:
                 1600,
                 12000,
                 870,
-                850,
-                81,
+                852,
+                91,
                 76,
-                96,
+                100,
                 66,
-                64,
+                69,
                 50,
             ],
             "Diamond": [
-                85,
-                82,
+                75,
+                86,
                 310,
-                125,
+                123,
                 110,
                 142,
                 3100,
@@ -608,12 +628,12 @@ class Voltaic:
                 1900,
                 14000,
                 880,
-                863,
-                88,
+                865,
+                98,
                 85,
-                105,
+                109,
                 72,
-                72,
+                77,
                 54,
             ],
         }
@@ -639,11 +659,31 @@ class Voltaic:
                 "B180T Voltaic",
                 "Smoothbot TS Voltaic",
             ],
-            "Master": [
+            "Jade": [
+                70,
+                78,
+                220,
+                130,
+                115,
+                152,
+                2600,
+                2700,
+                1100,
+                11300,
+                862,
+                850,
+                91,
                 85,
-                80,
+                102,
+                65,
+                64,
+                50,
+            ],
+            "Master": [
+                78,
+                88,
                 260,
-                140,
+                138,
                 120,
                 160,
                 2900,
@@ -652,18 +692,18 @@ class Voltaic:
                 12500,
                 870,
                 860,
+                97,
                 90,
-                90,
-                108,
+                110,
                 72,
-                68,
+                70,
                 55,
             ],
             "Grandmaster": [
-                95,
-                90,
+                85,
+                98,
                 320,
-                150,
+                148,
                 130,
                 175,
                 3400,
@@ -672,18 +712,18 @@ class Voltaic:
                 13800,
                 880,
                 872,
-                95,
+                103,
                 98,
-                115,
+                118,
                 79,
-                75,
+                78,
                 60,
             ],
             "Nova": [
+                95,
                 108,
-                102,
                 390,
-                162,
+                158,
                 142,
                 192,
                 3800,
@@ -692,19 +732,19 @@ class Voltaic:
                 14800,
                 888,
                 883,
-                101,
+                110,
                 105,
-                122,
+                125,
                 84,
-                82,
+                85,
                 65,
             ],
-            "Ascended": [
+            "Astra": [
+                105,
                 115,
-                110,
                 440,
-                175,
-                155,
+                170,
+                152,
                 210,
                 4000,
                 4100,
@@ -712,11 +752,11 @@ class Voltaic:
                 16000,
                 894,
                 887,
-                107,
+                116,
                 110,
-                128,
+                131,
                 88,
-                88,
+                90,
                 70,
             ],
         }
@@ -758,7 +798,10 @@ class Voltaic:
             str, str: Color codes for each rank.
         """
 
+        unranked = "#FFFFFF"
+
         primeBronze = "#b45f06"
+        secondBronze = "#fce5cd"
 
         primeSilver = "#cbd9e6"
         secondSilver = "#dce5ec"
@@ -772,6 +815,9 @@ class Voltaic:
         primeDiamond = "#b9f2ff"
         secondDiamond = "#e7faff"
 
+        primeJade = "#85fa85"
+        secondJade = "#cefdce"
+
         primeMaster = "#ec44ca"
         secondMaster = "#f8c0ed"
 
@@ -781,29 +827,33 @@ class Voltaic:
         primeNova = "#7900ff"
         secondNova = "#c089ff"
 
-        primeAscended = "#ff2262"
-        secondAscended = "#ff89aa"
+        primeAstra = "#ff2262"
+        secondAstra = "#ff89aa"
 
         if not is_adv:
             if tier == 0:
-                return primeBronze, secondSilver
+                return unranked, secondBronze
             elif tier == 1:
-                return primeSilver, secondGold
+                return primeBronze, secondSilver
             elif tier == 2:
-                return primeGold, secondPlat
+                return primeSilver, secondGold
             elif tier == 3:
-                return primePlat, secondDiamond
+                return primeGold, secondPlat
             elif tier == 4:
-                return primeDiamond, secondMaster
+                return primePlat, secondDiamond
+            elif tier == 5:
+                return primeDiamond, secondDiamond
 
         if tier == 0:
-            return primeMaster, secondGrandmaster
+            return primeJade, secondMaster
         elif tier == 1:
-            return primeGrandmaster, secondNova
+            return primeMaster, secondGrandmaster
         elif tier == 2:
-            return primeNova, secondAscended
+            return primeGrandmaster, secondNova
         elif tier == 3:
-            return primeAscended, secondAscended
+            return primeNova, secondAstra
+        elif tier == 4:
+            return primeAstra, secondAstra
 
 
 class Revosect:
@@ -1094,6 +1144,8 @@ class Revosect:
             str, str: Color codes for each rank.
         """
 
+        unranked = "#FFFFFF"
+
         primeBronze = "#b45f06"
         secondBronze = "#eaad99"
 
@@ -1126,14 +1178,16 @@ class Revosect:
 
         if not is_adv:
             if tier == 0:
-                return primeBronze, secondSilver
+                return unranked, secondBronze
             elif tier == 1:
-                return primeSilver, secondGold
+                return primeBronze, secondSilver
             elif tier == 2:
-                return primeGold, secondPlat
+                return primeSilver, secondGold
             elif tier == 3:
-                return primePlat, secondRuby
+                return primeGold, secondPlat
             elif tier == 4:
+                return primePlat, secondRuby
+            elif tier == 5:
                 return primeRuby, secondEmerald
 
         if tier == 0:
@@ -1157,16 +1211,18 @@ def find_volt_rank_int(tier_score: int) -> str:
     Returns:
         str: Rank name.
     """
-    if tier_score >= 36:
+    if tier_score >= 30:
         return "Diamond"
-    elif tier_score >= 18:
+    if tier_score >= 24:
         return "Platinum"
-    elif tier_score >= 12:
+    elif tier_score >= 18:
         return "Gold"
-    elif tier_score >= 6:
+    elif tier_score >= 12:
         return "Silver"
+    elif tier_score >= 6:
+        return "Bronze"
 
-    return "Bronze"
+    return "Unrated"
 
 
 def find_volt_rank_adv(tier_score: int) -> str:
@@ -1178,7 +1234,7 @@ def find_volt_rank_adv(tier_score: int) -> str:
     Returns:
         str: Rank name.
     """
-    if tier_score >= 36:
+    if tier_score >= 24:
         return "Ascended"
     elif tier_score >= 18:
         return "Nova"
@@ -1197,16 +1253,18 @@ def find_ra_rank_easy(tier_score: int) -> str:
     Returns:
         str: Rank name.
     """
-    if tier_score >= 36:
+    if tier_score >= 30:
         return "Diamond"
-    elif tier_score >= 18:
+    if tier_score >= 24:
         return "Platinum"
-    elif tier_score >= 12:
+    elif tier_score >= 18:
         return "Gold"
-    elif tier_score >= 6:
+    elif tier_score >= 12:
         return "Silver"
+    elif tier_score >= 6:
+        return "Bronze"
 
-    return "Bronze"
+    return "Unrated"
 
 
 def find_ra_rank_adv(tier_score: int) -> str:
@@ -1218,7 +1276,7 @@ def find_ra_rank_adv(tier_score: int) -> str:
     Returns:
         str: Rank name.
     """
-    if tier_score >= 36:
+    if tier_score >= 24:
         return "Archon"
     elif tier_score >= 18:
         return "Immortal"
