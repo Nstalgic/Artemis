@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
         self.main_ui.setupUi(self)
         global WIDGETS
         WIDGETS = self.main_ui
-        self.version = "v1.0.1"
+        self.version = "v1.1.0"
         Settings.ENABLE_CUSTOM_TITLE_BAR = True
 
         title = "Artemis"
@@ -261,6 +261,7 @@ class MainWindow(QMainWindow):
         tier_2_scores = data[tier_keys[2]]
         tier_3_scores = data[tier_keys[3]]
         tier_4_scores = data[tier_keys[4]]
+        tier_5_scores = data[tier_keys[5]]
         i = None
         scenario_tiers = []
 
@@ -290,29 +291,35 @@ class MainWindow(QMainWindow):
             bench_tier.setVisible(True)
             bench_bar.setValue(0)
             df = self.dataframe.loc[self.dataframe["Scenario"] == scenario]
-            tier_rank = 0
             if str(df["Score"].max()) != "nan":
                 bench_bar.reset()
                 bench_bar.setFormat(scenario)
                 max_score = df["High Score"].max()
 
-                if max_score <= tier_1_scores[i]:
+                if max_score >= tier_5_scores[i]:
+                    bench_bar.setMaximum(max_score)
                     bench_bar.setMinimum(0)
-                    bench_bar.setMaximum(tier_1_scores[i])
-                elif max_score <= tier_2_scores[i]:
-                    bench_bar.setMinimum(tier_1_scores[i])
-                    bench_bar.setMaximum(tier_2_scores[i])
-                    tier_rank = 1
-                elif max_score <= tier_3_scores[i]:
-                    bench_bar.setMinimum(tier_2_scores[i])
-                    bench_bar.setMaximum(tier_3_scores[i])
-                    tier_rank = 2
-                elif max_score < tier_4_scores[i]:
-                    bench_bar.setMinimum(tier_3_scores[i])
-                    bench_bar.setMaximum(tier_4_scores[i])
-                    tier_rank = 3
-                else:
+                    tier_rank = 5
+                elif max_score >= tier_4_scores[i]:
+                    bench_bar.setMaximum(tier_5_scores[i])
+                    bench_bar.setMinimum(tier_4_scores[i])
                     tier_rank = 4
+                elif max_score >= tier_3_scores[i]:
+                    bench_bar.setMaximum(tier_4_scores[i])
+                    bench_bar.setMinimum(tier_3_scores[i])
+                    tier_rank = 3
+                elif max_score >= tier_2_scores[i]:
+                    bench_bar.setMaximum(tier_3_scores[i])
+                    bench_bar.setMinimum(tier_2_scores[i])
+                    tier_rank = 2
+                elif max_score >= tier_1_scores[i]:
+                    bench_bar.setMaximum(tier_2_scores[i])
+                    bench_bar.setMinimum(tier_1_scores[i])
+                    tier_rank = 1
+                else:
+                    bench_bar.setMaximum(tier_1_scores[i])
+                    bench_bar.setMinimum(0)
+                    tier_rank = 0
 
                 tier_color, bar_color = benchmark_class.get_color_codes(
                     tier_rank, is_adv=is_adv
