@@ -7,3 +7,4 @@ saved_data
 .vscode/settings.json
 .qt_for_python/uic/main.py
 setup.py
+log.log

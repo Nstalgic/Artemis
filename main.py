@@ -6,6 +6,9 @@ JUNE 10, 2021
 V: 1.0.0
 ///////////////////////////////////////////////////////////////
 """
+import logging
+
+logging.basicConfig(filename="log.log", level=logging.INFO)
 import datetime as dt
 import glob
 import itertools
@@ -57,7 +60,7 @@ class MainWindow(QMainWindow):
         self.main_ui.setupUi(self)
         global WIDGETS
         WIDGETS = self.main_ui
-        self.version = "v1.1.0"
+        self.version = "v1.1.1"
         Settings.ENABLE_CUSTOM_TITLE_BAR = True
 
         title = "Artemis"
@@ -232,7 +235,8 @@ class MainWindow(QMainWindow):
                     to_append = self._parse_files(file)
                     self.table_entries.append(to_append)
                     print(f"New File Saved: {file}")
-                except AttributeError:
+                except AttributeError as msg:
+                    logging.error(msg)
                     continue
 
         util.Save(
@@ -724,52 +728,55 @@ class MainWindow(QMainWindow):
             average, highscore, % difference from average, and % different from high score.
         """
         name = cu.get_map_name(directory)
-        scenario_scores = cu.get_map_score(
-            name, self.files_by_challenge, self.stats_directory
-        )
+        try:
+            scenario_scores = cu.get_map_score(
+                name, self.files_by_challenge, self.stats_directory
+            )
 
-        self.all_maps.append(name)
-        session = cu.SessionStat.from_file(directory)
-        score = session.summary.score
-        kills = session.summary[0]
-        date = str(session.date)
-        accuracy = round(session.accuracy * 100)
-        average = np.average(scenario_scores)
-        average = np.nan_to_num(average)
-        high_score = np.amax(scenario_scores)
+            self.all_maps.append(name)
+            session = cu.SessionStat.from_file(directory)
+            score = session.summary.score
+            kills = session.summary[0]
+            date = str(session.date)
+            accuracy = round(session.accuracy * 100)
+            average = np.average(scenario_scores)
+            average = np.nan_to_num(average)
+            high_score = np.amax(scenario_scores)
 
-        a = pd.Series([average, score])
-        h = pd.Series([high_score, score])
+            a = pd.Series([average, score])
+            h = pd.Series([high_score, score])
 
-        d_average = a.pct_change()
-        d_high_score = h.pct_change()
+            d_average = a.pct_change()
+            d_high_score = h.pct_change()
 
-        s_average = d_average[1]
-        s_high_score = d_high_score[1]
-        s_average = round(s_average * 100, 2)
-        s_high_score = round(s_high_score * 100, 2)
+            s_average = d_average[1]
+            s_high_score = d_high_score[1]
+            s_average = round(s_average * 100, 2)
+            s_high_score = round(s_high_score * 100, 2)
 
-        if kills == 0:
-            kills = ""
+            if kills == 0:
+                kills = ""
 
-        if s_average > 0:
-            s_average = "+" + str(s_average)
+            if s_average > 0:
+                s_average = "+" + str(s_average)
 
-        if s_high_score > 0:
-            s_high_score = "+" + str(s_high_score)
+            if s_high_score > 0:
+                s_high_score = "+" + str(s_high_score)
 
-        self.saved_files.append(directory)
-        return [
-            date,
-            name,
-            round(score, 1),
-            kills,
-            accuracy,
-            round(average, 1),
-            round(high_score, 1),
-            str(s_average) + "%",
-            str(s_high_score) + "%",
-        ]
+            self.saved_files.append(directory)
+            return [
+                date,
+                name,
+                round(score, 1),
+                kills,
+                accuracy,
+                round(average, 1),
+                round(high_score, 1),
+                str(s_average) + "%",
+                str(s_high_score) + "%",
+            ]
+        except ValueError:
+            raise AttributeError("incompatible file contents:", directory)
 
     def _update_header(self):
         """Updates headers of main dashboard with a white border"""
