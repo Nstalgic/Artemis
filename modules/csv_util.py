@@ -187,7 +187,11 @@ def get_map_score(name: str, files_by_challenge: list, stats_directory: str) -> 
     """
     scenario_scores = []
     for scenario in files_by_challenge[name]:
-        scenario_directory = os.path.join(stats_directory, scenario)
-        scenario_scores.append(SessionStat.from_file(scenario_directory).summary.score)
+        try:
+            scenario_directory = os.path.join(stats_directory, scenario)
+            summary_score = SessionStat.from_file(scenario_directory).summary.score
+            scenario_scores.append(summary_score)
+        except:
+            continue
 
     return scenario_scores

@@ -60,7 +60,7 @@ class MainWindow(QMainWindow):
         self.main_ui.setupUi(self)
         global WIDGETS
         WIDGETS = self.main_ui
-        self.version = "v1.1.1"
+        self.version = "v1.1.2"
         Settings.ENABLE_CUSTOM_TITLE_BAR = True
 
         title = "Artemis"
@@ -232,11 +232,20 @@ class MainWindow(QMainWindow):
 
             if file not in self.saved_files:
                 try:
+
                     to_append = self._parse_files(file)
                     self.table_entries.append(to_append)
                     print(f"New File Saved: {file}")
+
                 except AttributeError as msg:
-                    logging.error(msg)
+                    logging.error(
+                        f"LoadError(AttributeError) - File: {file} - Message: {msg}"
+                    )
+                    continue
+                except ValueError as msg:
+                    logging.error(
+                        f"LoadError(ValueError) - File: {file} - Message: {msg}"
+                    )
                     continue
 
         util.Save(
@@ -674,48 +683,52 @@ class MainWindow(QMainWindow):
 
         if m:
             if file_name not in self.saved_files:
-                self.file_name.append(file_name)
-                self.saved_files.append(file_name)
-                self.files_by_challenge[m.group("name")].append(file_name)
+                try:
+                    to_append = self._parse_files(directory)
 
-                to_append = self._parse_files(directory)
+                    a_series = pd.Series(to_append, index=self.dataframe.columns)
+                    self.dataframe = self.dataframe.append(a_series, ignore_index=True)
 
-                a_series = pd.Series(to_append, index=self.dataframe.columns)
-                self.dataframe = self.dataframe.append(a_series, ignore_index=True)
+                    self.dataframe[["Date"]] = self.dataframe[["Date"]].apply(
+                        pd.to_datetime
+                    )
+                    self.dataframe[["Score"]] = self.dataframe[["Score"]].apply(
+                        pd.to_numeric
+                    )
+                    self.dataframe[["Avg Score"]] = self.dataframe[["Avg Score"]].apply(
+                        pd.to_numeric
+                    )
+                    self.dataframe[["High Score"]] = self.dataframe[
+                        ["High Score"]
+                    ].apply(pd.to_numeric)
 
-                self.dataframe[["Date"]] = self.dataframe[["Date"]].apply(
-                    pd.to_datetime
-                )
-                self.dataframe[["Score"]] = self.dataframe[["Score"]].apply(
-                    pd.to_numeric
-                )
-                self.dataframe[["Avg Score"]] = self.dataframe[["Avg Score"]].apply(
-                    pd.to_numeric
-                )
-                self.dataframe[["High Score"]] = self.dataframe[["High Score"]].apply(
-                    pd.to_numeric
-                )
+                    self.dataframe = self.dataframe.sort_values(
+                        by="Date", ascending=False
+                    )
 
-                self.dataframe = self.dataframe.sort_values(by="Date", ascending=False)
-                # Corrects datatypes in Dataframe
+                    self.table_entries.append(to_append)
+                    self.file_name.append(file_name)
+                    self.saved_files.append(file_name)
+                    self.files_by_challenge[m.group("name")].append(file_name)
 
-                self.table_entries.append(to_append)
-                util.Save(
-                    self.all_maps,
-                    self.table_entries,
-                    self.saved_files,
-                    self.stats_directory,
-                    self.selected_benchmark,
-                )
-                WIDGETS.creditsLabel.setText(
-                    f"Latest Scenario: {to_append[1]} | Score: {to_append[2]}"
-                )
-                self._update_pages()
-                self._setup_homepage()
-                self._update_header()
+                    util.Save(
+                        self.all_maps,
+                        self.table_entries,
+                        self.saved_files,
+                        self.stats_directory,
+                        self.selected_benchmark,
+                    )
+                    WIDGETS.creditsLabel.setText(
+                        f"Latest Scenario: {to_append[1]} | Score: {to_append[2]}"
+                    )
+                    self._update_pages()
+                    self._setup_homepage()
+                    self._update_header()
 
-                if self._is_tracked():
-                    self._update_benchmark_bars(True)
+                    if self._is_tracked():
+                        self._update_benchmark_bars(True)
+                except Exception as msg:
+                    logging.error(f"UpdateError - File: {file_name} - Message: {msg}")
 
     def _parse_files(self, directory: str) -> list:
         """Parses a csv file and loads the data into a list.
@@ -728,55 +741,53 @@ class MainWindow(QMainWindow):
             average, highscore, % difference from average, and % different from high score.
         """
         name = cu.get_map_name(directory)
-        try:
-            scenario_scores = cu.get_map_score(
-                name, self.files_by_challenge, self.stats_directory
-            )
 
-            self.all_maps.append(name)
-            session = cu.SessionStat.from_file(directory)
-            score = session.summary.score
-            kills = session.summary[0]
-            date = str(session.date)
-            accuracy = round(session.accuracy * 100)
-            average = np.average(scenario_scores)
-            average = np.nan_to_num(average)
-            high_score = np.amax(scenario_scores)
+        scenario_scores = cu.get_map_score(
+            name, self.files_by_challenge, self.stats_directory
+        )
 
-            a = pd.Series([average, score])
-            h = pd.Series([high_score, score])
+        self.all_maps.append(name)
+        session = cu.SessionStat.from_file(directory)
+        score = session.summary.score
+        kills = session.summary[0]
+        date = str(session.date)
+        accuracy = round(session.accuracy * 100)
+        average = np.average(scenario_scores)
+        average = np.nan_to_num(average)
+        high_score = np.amax(scenario_scores)
 
-            d_average = a.pct_change()
-            d_high_score = h.pct_change()
+        a = pd.Series([average, score])
+        h = pd.Series([high_score, score])
 
-            s_average = d_average[1]
-            s_high_score = d_high_score[1]
-            s_average = round(s_average * 100, 2)
-            s_high_score = round(s_high_score * 100, 2)
+        d_average = a.pct_change()
+        d_high_score = h.pct_change()
 
-            if kills == 0:
-                kills = ""
+        s_average = d_average[1]
+        s_high_score = d_high_score[1]
+        s_average = round(s_average * 100, 2)
+        s_high_score = round(s_high_score * 100, 2)
 
-            if s_average > 0:
-                s_average = "+" + str(s_average)
+        if kills == 0:
+            kills = ""
 
-            if s_high_score > 0:
-                s_high_score = "+" + str(s_high_score)
+        if s_average > 0:
+            s_average = "+" + str(s_average)
 
-            self.saved_files.append(directory)
-            return [
-                date,
-                name,
-                round(score, 1),
-                kills,
-                accuracy,
-                round(average, 1),
-                round(high_score, 1),
-                str(s_average) + "%",
-                str(s_high_score) + "%",
-            ]
-        except ValueError:
-            raise AttributeError("incompatible file contents:", directory)
+        if s_high_score > 0:
+            s_high_score = "+" + str(s_high_score)
+
+        self.saved_files.append(directory)
+        return [
+            date,
+            name,
+            round(score, 1),
+            kills,
+            accuracy,
+            round(average, 1),
+            round(high_score, 1),
+            str(s_average) + "%",
+            str(s_high_score) + "%",
+        ]
 
     def _update_header(self):
         """Updates headers of main dashboard with a white border"""
