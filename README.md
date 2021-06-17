@@ -6,7 +6,7 @@
 
 ### 🔮Download
 
-[Download Link](https://github.com/Nstalgic/Artemis/releases/download/v1.1.1/Artemis-Training-Assistant-v1.1.1.zip)
+[Download Link](https://github.com/Nstalgic/Artemis/releases/download/v1.1.2/Artemis-Training-Assistant-v1.1.2.zip)
 
 
 ### 📂Installation
