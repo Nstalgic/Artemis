@@ -32,7 +32,6 @@ class SessionStat(object):
             "damage_done",
             "damage_taken",
             "score",
-            "game_version",
         ],
     )
     Kill = namedtuple(
@@ -111,11 +110,6 @@ class SessionStat(object):
             float(summary_info["Damage Done"]),
             float(summary_info["Damage Taken"]),
             float(summary_info["Score"]) + score_offset,
-            tuple(map(int, summary_info["Game Version"].split("."))),
-        )
-
-        timestamp_format = (
-            "%H:%M:%S:%f" if summary.game_version < (2, 0, 1, 0) else "%H:%M:%S.%f"
         )
 
         kills = []
@@ -124,7 +118,7 @@ class SessionStat(object):
             kills.append(
                 SessionStat.Kill(
                     int(row["Kill #"]),
-                    datetime.strptime(row["Timestamp"], timestamp_format),
+                    datetime.strptime(row["Timestamp"], "%H:%M:%S.%f"),
                     row["Bot"],
                     row["Weapon"],
                     float(row["TTK"][:-1]),
