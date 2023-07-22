@@ -60,7 +60,7 @@ class MainWindow(QMainWindow):
         self.main_ui.setupUi(self)
         global WIDGETS
         WIDGETS = self.main_ui
-        self.version = "v1.1.2"
+        self.version = "v1.1.3"
         Settings.ENABLE_CUSTOM_TITLE_BAR = True
 
         title = "Artemis"
@@ -519,7 +519,8 @@ class MainWindow(QMainWindow):
 
         scenario_count = len(df)
 
-        if scenario_count >= 30:
+        # if scenario_count >= 30:
+        if False:
             WIDGETS.pushButton.setVisible(True)
         else:
             WIDGETS.pushButton.setVisible(False)
