@@ -18,7 +18,7 @@ files = [
 
 # TARGET
 target = Executable(
-    script="main.py", base="Win32GUI", icon="icon.ico", targetName="Artemis.exe"
+    script="main.py", base="Win32GUI", icon="icon.ico", target_name="Artemis.exe"
 )
 
 
